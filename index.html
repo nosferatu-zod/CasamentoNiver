@@ -26,6 +26,7 @@ h1, p {
     position: relative;
 }
 
+/* CANVAS */
 canvas {
     background: #fff;
     border: 3px solid #ffb6c1;
@@ -35,7 +36,7 @@ canvas {
 /* BOTÃO MOBILE */
 #btnPular {
     position: absolute;
-    bottom: 20px;
+    bottom: 100px; /* SUBIU */
     right: 20px;
     width: 80px;
     height: 80px;
@@ -49,6 +50,37 @@ canvas {
     user-select: none;
     touch-action: none;
 }
+
+/* OVERLAY FINAL */
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    color: white;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    padding: 20px;
+}
+
+#overlay p {
+    max-width: 500px;
+    line-height: 1.5;
+}
+
+#resetBtn {
+    margin-top: 20px;
+    padding: 10px 20px;
+    border: none;
+    background: #ff4d6d;
+    color: white;
+    font-size: 16px;
+    border-radius: 10px;
+}
 </style>
 </head>
 <body>
@@ -61,10 +93,28 @@ canvas {
     <div id="btnPular">PULAR</div>
 </div>
 
+<!-- OVERLAY FINAL -->
+<div id="overlay">
+    <h2>💍 Feliz Aniversário de Casamento</h2>
+    <p>
+        Já passamos por muita coisa juntos,<br>
+        mas nosso amor sempre foi mais forte.<br><br>
+
+        Prometo estar sempre ao seu lado,<br>
+        te amar e te respeitar para sempre.<br><br>
+
+        ❤️ Te amo Edna ❤️<br>
+        — Wesley
+    </p>
+    <button id="resetBtn">Jogar novamente</button>
+</div>
+
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
 const btn = document.getElementById("btnPular");
+const overlay = document.getElementById("overlay");
+const resetBtn = document.getElementById("resetBtn");
 
 const BASE_WIDTH = 800;
 const BASE_HEIGHT = 350;
@@ -95,21 +145,19 @@ function beep() {
     osc.stop(audio.currentTime + 0.1);
 }
 
-let noiva = {
-    x: 50,
-    y: 270,
-    vy: 0,
-    gravity: 0.5,
-    grounded: true
-};
+let noiva, obstaculos, score, gameOver, velocidade, pressionando;
 
-let obstaculos = [];
-let score = 0;
-let gameOver = false;
-let velocidade = 4;
-let coracoes = [];
+function resetGame() {
+    noiva = { x: 50, y: 270, vy: 0, gravity: 0.5, grounded: true };
+    obstaculos = [];
+    score = 0;
+    gameOver = false;
+    velocidade = 4;
+    pressionando = false;
+    overlay.style.display = "none";
+}
 
-let pressionando = false;
+resetGame();
 
 function iniciarPulo() {
     if (noiva.grounded && !gameOver) {
@@ -124,7 +172,7 @@ function pararPulo() {
     pressionando = false;
 }
 
-// teclado
+// controles
 document.addEventListener("keydown", e => {
     if (e.code === "Space") iniciarPulo();
 });
@@ -132,13 +180,13 @@ document.addEventListener("keyup", e => {
     if (e.code === "Space") pararPulo();
 });
 
-// botão mobile
 btn.addEventListener("touchstart", iniciarPulo);
 btn.addEventListener("touchend", pararPulo);
 
-// fallback toque tela
 canvas.addEventListener("touchstart", iniciarPulo);
 canvas.addEventListener("touchend", pararPulo);
+
+resetBtn.onclick = resetGame;
 
 // obstáculos
 function criarObstaculo() {
@@ -146,21 +194,7 @@ function criarObstaculo() {
     obstaculos.push({ x: BASE_WIDTH, tipo });
 }
 
-function criarCoracao() {
-    coracoes.push({
-        x: Math.random() * BASE_WIDTH,
-        y: BASE_HEIGHT,
-        velocidade: 1 + Math.random()
-    });
-}
-
 function update() {
-    if (gameOver && score >= 1000) {
-        if (Math.random() < 0.1) criarCoracao();
-        coracoes.forEach(c => c.y -= c.velocidade);
-        return;
-    }
-
     if (gameOver) return;
 
     noiva.vy += noiva.gravity;
@@ -198,7 +232,10 @@ function update() {
         }
     });
 
-    if (score >= 1000) gameOver = true;
+    if (score >= 1000) {
+        gameOver = true;
+        overlay.style.display = "flex";
+    }
 }
 
 function draw() {
@@ -224,43 +261,9 @@ function draw() {
     ctx.font = "18px Arial";
     ctx.fillText("Pontos: " + score, 600, 30);
 
-    if (gameOver) {
-        if (score >= 1000) {
-
-            ctx.fillStyle = "rgba(0,0,0,0.7)";
-            ctx.fillRect(30, 40, 740, 160);
-
-            ctx.fillStyle = "white";
-            ctx.textAlign = "center";
-            ctx.font = "20px Arial";
-
-            let linhas = [
-                "Feliz Aniversário de Casamento 💍",
-                "",
-                "Já passamos por muita coisa juntos,",
-                "mas nosso amor sempre foi mais forte.",
-                "",
-                "Prometo estar sempre ao seu lado,",
-                "te amar e te respeitar para sempre.",
-                "",
-                "Te amo Edna ❤️",
-                "— Wesley"
-            ];
-
-            linhas.forEach((linha, i) => {
-                ctx.fillText(linha, BASE_WIDTH / 2, 70 + (i * 18));
-            });
-
-            ctx.font = "22px Arial";
-            coracoes.forEach(c => {
-                ctx.fillText("❤️", c.x, c.y);
-            });
-
-        } else {
-            ctx.fillStyle = "black";
-            ctx.textAlign = "center";
-            ctx.fillText("💔 Game Over!", BASE_WIDTH/2, 150);
-        }
+    if (gameOver && score < 1000) {
+        ctx.textAlign = "center";
+        ctx.fillText("💔 Game Over!", BASE_WIDTH/2, 150);
     }
 }
 
