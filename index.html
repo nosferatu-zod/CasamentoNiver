@@ -11,107 +11,80 @@ body {
     background: linear-gradient(to right, #ffe6f0, #ffffff);
     font-family: Arial;
     text-align: center;
-    overflow: hidden;
-}
-
-h1, p {
-    margin: 5px;
 }
 
 #container {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: calc(100vh - 60px);
+    height: 100vh;
     position: relative;
 }
 
-/* CANVAS */
 canvas {
     background: #fff;
     border: 3px solid #ffb6c1;
     border-radius: 10px;
 }
 
-/* BOTÃO MOBILE */
+/* botão pular */
 #btnPular {
     position: absolute;
-    bottom: 100px; /* SUBIU */
+    bottom: 100px;
     right: 20px;
     width: 80px;
     height: 80px;
     background: #ff4d6d;
     color: white;
     border-radius: 50%;
-    font-size: 14px;
     display: flex;
     justify-content: center;
     align-items: center;
-    user-select: none;
-    touch-action: none;
 }
 
-/* OVERLAY FINAL */
+/* overlay */
 #overlay {
     position: fixed;
+    z-index: 9999; /* GARANTIDO */
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.85);
     color: white;
     display: none;
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding: 20px;
-}
-
-#overlay p {
-    max-width: 500px;
-    line-height: 1.5;
 }
 
 #resetBtn {
     margin-top: 20px;
     padding: 10px 20px;
-    border: none;
     background: #ff4d6d;
     color: white;
-    font-size: 16px;
+    border: none;
     border-radius: 10px;
 }
 </style>
 </head>
 <body>
 
-<h1>Noiva Runner 💍</h1>
-<p>Segure para pular mais alto</p>
-
 <div id="container">
     <canvas id="game"></canvas>
     <div id="btnPular">PULAR</div>
 </div>
 
-<!-- OVERLAY FINAL -->
 <div id="overlay">
-    <h2>💍 Feliz Aniversário de Casamento</h2>
-    <p>
-        Já passamos por muita coisa juntos,<br>
-        mas nosso amor sempre foi mais forte.<br><br>
-
-        Prometo estar sempre ao seu lado,<br>
-        te amar e te respeitar para sempre.<br><br>
-
-        ❤️ Te amo Edna ❤️<br>
-        — Wesley
-    </p>
+    <h2>💍 Feliz Aniversário</h2>
+    <p>Te amo Edna ❤️</p>
     <button id="resetBtn">Jogar novamente</button>
 </div>
 
 <script>
 const canvas = document.getElementById("game");
 const ctx = canvas.getContext("2d");
+
 const btn = document.getElementById("btnPular");
 const overlay = document.getElementById("overlay");
 const resetBtn = document.getElementById("resetBtn");
@@ -119,36 +92,17 @@ const resetBtn = document.getElementById("resetBtn");
 const BASE_WIDTH = 800;
 const BASE_HEIGHT = 350;
 
-let scale = 1;
+canvas.width = BASE_WIDTH;
+canvas.height = BASE_HEIGHT;
 
-function resizeCanvas() {
-    const screenWidth = window.innerWidth;
-    const screenHeight = window.innerHeight - 60;
-
-    scale = Math.min(screenWidth / BASE_WIDTH, screenHeight / BASE_HEIGHT);
-
-    canvas.width = BASE_WIDTH * scale;
-    canvas.height = BASE_HEIGHT * scale;
-
-    ctx.setTransform(scale, 0, 0, scale, 0, 0);
-}
-
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-function beep() {
-    const audio = new AudioContext();
-    const osc = audio.createOscillator();
-    osc.frequency.setValueAtTime(500, audio.currentTime);
-    osc.connect(audio.destination);
-    osc.start();
-    osc.stop(audio.currentTime + 0.1);
-}
+// imagem da noiva
+const imgNoiva = new Image();
+imgNoiva.src = "noiva.png";
 
 let noiva, obstaculos, score, gameOver, velocidade, pressionando;
 
 function resetGame() {
-    noiva = { x: 50, y: 270, vy: 0, gravity: 0.5, grounded: true };
+    noiva = { x: 50, y: 250, vy: 0, grounded: true };
     obstaculos = [];
     score = 0;
     gameOver = false;
@@ -156,15 +110,14 @@ function resetGame() {
     pressionando = false;
     overlay.style.display = "none";
 }
-
 resetGame();
 
+// pulo
 function iniciarPulo() {
     if (noiva.grounded && !gameOver) {
-        noiva.vy = -7;
+        noiva.vy = -10;
         noiva.grounded = false;
         pressionando = true;
-        beep();
     }
 }
 
@@ -183,34 +136,34 @@ document.addEventListener("keyup", e => {
 btn.addEventListener("touchstart", iniciarPulo);
 btn.addEventListener("touchend", pararPulo);
 
-canvas.addEventListener("touchstart", iniciarPulo);
-canvas.addEventListener("touchend", pararPulo);
-
-resetBtn.onclick = resetGame;
+// reset
+resetBtn.onclick = () => {
+    resetGame();
+};
 
 // obstáculos
 function criarObstaculo() {
-    const tipo = Math.random() > 0.5 ? "arvore" : "carro";
-    obstaculos.push({ x: BASE_WIDTH, tipo });
+    obstaculos.push({
+        x: BASE_WIDTH,
+        tipo: Math.random() > 0.5 ? "🌳" : "🚗"
+    });
 }
 
 function update() {
     if (gameOver) return;
 
-    noiva.vy += noiva.gravity;
+    noiva.vy += 0.6;
     noiva.y += noiva.vy;
 
     if (pressionando && noiva.vy < 0) {
-        noiva.vy -= 0.3;
+        noiva.vy -= 0.4;
     }
 
-    if (noiva.y >= 270) {
-        noiva.y = 270;
+    if (noiva.y >= 250) {
+        noiva.y = 250;
         noiva.vy = 0;
         noiva.grounded = true;
     }
-
-    velocidade += 0.001;
 
     if (Math.random() < 0.01) criarObstaculo();
 
@@ -218,10 +171,9 @@ function update() {
         obs.x -= velocidade;
 
         if (
-            noiva.x + 10 < obs.x + 20 &&
-            noiva.x + 20 > obs.x &&
-            noiva.y + 10 < 300 &&
-            noiva.y + 20 > 270
+            noiva.x < obs.x + 40 &&
+            noiva.x + 40 > obs.x &&
+            noiva.y + 50 > 260
         ) {
             gameOver = true;
         }
@@ -232,7 +184,7 @@ function update() {
         }
     });
 
-    if (score >= 1000) {
+    if (score >= 1000 && !gameOver) {
         gameOver = true;
         overlay.style.display = "flex";
     }
@@ -241,30 +193,21 @@ function update() {
 function draw() {
     ctx.clearRect(0,0,BASE_WIDTH,BASE_HEIGHT);
 
+    // chão
     ctx.fillStyle = "#ddd";
     ctx.fillRect(0,300,BASE_WIDTH,5);
 
-    if (score >= 800) {
-        ctx.font = "40px Arial";
-        ctx.fillText("⛪", 700, 280);
-    }
+    // noiva (imagem)
+    ctx.drawImage(imgNoiva, noiva.x, noiva.y, 80, 120);
 
-    ctx.font = "30px Arial";
-    ctx.fillText("👰🏾", noiva.x, noiva.y + 25);
-
+    // obstáculos
     ctx.font = "30px Arial";
     obstaculos.forEach(obs => {
-        ctx.fillText(obs.tipo === "arvore" ? "🌳" : "🚗", obs.x, 295);
+        ctx.fillText(obs.tipo, obs.x, 295);
     });
 
     ctx.fillStyle = "black";
-    ctx.font = "18px Arial";
     ctx.fillText("Pontos: " + score, 600, 30);
-
-    if (gameOver && score < 1000) {
-        ctx.textAlign = "center";
-        ctx.fillText("💔 Game Over!", BASE_WIDTH/2, 150);
-    }
 }
 
 function loop() {
