@@ -45,7 +45,7 @@ canvas {
 /* overlay */
 #overlay {
     position: fixed;
-    z-index: 9999; /* GARANTIDO */
+    z-index: 9999;
     top: 0;
     left: 0;
     width: 100%;
@@ -102,7 +102,7 @@ imgNoiva.src = "noiva.png";
 let noiva, obstaculos, score, gameOver, velocidade, pressionando;
 
 function resetGame() {
-    noiva = { x: 50, y: 250, vy: 0, grounded: true };
+    noiva = { x: 50, y: 240, vy: 0, grounded: true };
     obstaculos = [];
     score = 0;
     gameOver = false;
@@ -159,8 +159,8 @@ function update() {
         noiva.vy -= 0.4;
     }
 
-    if (noiva.y >= 250) {
-        noiva.y = 250;
+    if (noiva.y >= 240) {
+        noiva.y = 240;
         noiva.vy = 0;
         noiva.grounded = true;
     }
@@ -172,7 +172,7 @@ function update() {
 
         if (
             noiva.x < obs.x + 40 &&
-            noiva.x + 40 > obs.x &&
+            noiva.x + 30 > obs.x &&
             noiva.y + 50 > 260
         ) {
             gameOver = true;
@@ -197,8 +197,8 @@ function draw() {
     ctx.fillStyle = "#ddd";
     ctx.fillRect(0,300,BASE_WIDTH,5);
 
-    // noiva (imagem)
-    ctx.drawImage(imgNoiva, noiva.x, noiva.y, 80, 120);
+    // noiva (AJUSTADA)
+    ctx.drawImage(imgNoiva, noiva.x, noiva.y, 35, 60);
 
     // obstáculos
     ctx.font = "30px Arial";
