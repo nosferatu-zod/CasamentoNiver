@@ -1,3 +1,4 @@
+```html id="x8m2pz"
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -56,6 +57,20 @@ canvas {
     justify-content: center;
     align-items: center;
     flex-direction: column;
+    text-align: center;
+    padding: 20px;
+}
+
+#overlay p {
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+#overlay img {
+    margin-top: 15px;
+    width: 200px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(255,255,255,0.3);
 }
 
 #resetBtn {
@@ -75,12 +90,17 @@ canvas {
     <div id="btnPular">PULAR</div>
 </div>
 
-
 <div id="overlay">
     <h2>💍 Feliz Aniversário de Casamento</h2>
-    <p>Mesmo com todos os obstaculos da vida permanecemos juntos, sei que nao foi um bom fim de semana e sei que a culpa é minha. Mas quero te lembrar do dia mais feliz da minha vida, que foi quando casamos. Lembro de estar tremendo, e ate gaguejei na hora de dizer sim. So quero dizer que mesmo com todas as dificuldades e problemas quero permanecer ao seu lado. Voce me torna um homem melhor e nao quero deixar que o alcool destrua tudo que tenho. Quero ter filhos com vc e ser um bom pai. Quero envelhecer ao seu lado e estar com vc ate ficar velhinho e morrer. Pois voce é a luz que ilumina toda escuridao que tenho. Voce é o farol que me guia quando estou perdido. Voce é linda, uma esposa incrivel e maravilhosa. Amo cada minuto desses 3 anos juntos e que venham muito mais anos! </p>
-    <p>Te amo Edna ❤️</p>
+
+    <p>
+         <p>Mesmo com todos os obstaculos da vida permanecemos juntos, <br>sei que nao foi um bom fim de semana e sei que a culpa é minha.<br> Mas quero te lembrar do dia mais feliz da minha vida,<br> que foi quando casamos.<br> Lembro de estar tremendo, e ate gaguejei na hora de dizer sim. So quero dizer que mesmo com todas as dificuldades e problemas quero permanecer ao seu lado.<br> Voce me torna um homem melhor e nao quero deixar que o alcool destrua tudo que tenho.<br> Quero ter filhos com vc e ser um bom pai. Quero envelhecer ao seu lado e estar com vc ate ficar velhinho e morrer.<br> Pois voce é a luz que ilumina toda escuridao que tenho.<br><br> Voce é o farol que me guia quando estou perdido. Voce é linda, uma esposa incrivel e maravilhosa.<br><br> Amo cada minuto desses 3 anos juntos e que venham muito mais anos! </p><br><br>
+
+        ❤️ Te amo Edna ❤️
+    </p>
+
     <img src="euevc.jpeg" alt="Nós">
+
     <button id="resetBtn">Jogar novamente</button>
 </div>
 
@@ -173,10 +193,17 @@ function update() {
     obstaculos.forEach((obs, i) => {
         obs.x -= velocidade;
 
+        const hitbox = {
+            x: noiva.x + 5,
+            y: noiva.y + 5,
+            w: 25,
+            h: 45
+        };
+
         if (
-            noiva.x < obs.x + 40 &&
-            noiva.x + 30 > obs.x &&
-            noiva.y + 50 > 260
+            hitbox.x < obs.x + 20 &&
+            hitbox.x + hitbox.w > obs.x &&
+            hitbox.y + hitbox.h > 260
         ) {
             gameOver = true;
         }
@@ -196,14 +223,11 @@ function update() {
 function draw() {
     ctx.clearRect(0,0,BASE_WIDTH,BASE_HEIGHT);
 
-    // chão
     ctx.fillStyle = "#ddd";
     ctx.fillRect(0,300,BASE_WIDTH,5);
 
-    // noiva (AJUSTADA)
-    ctx.drawImage(imgNoiva, noiva.x, noiva.y, 25, 65);
+    ctx.drawImage(imgNoiva, noiva.x, noiva.y, 35, 60);
 
-    // obstáculos
     ctx.font = "30px Arial";
     obstaculos.forEach(obs => {
         ctx.fillText(obs.tipo, obs.x, 295);
